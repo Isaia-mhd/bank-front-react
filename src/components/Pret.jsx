@@ -12,6 +12,7 @@ import Spinner from "./Spinner";
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
 function Pret() {
+    const token = localStorage.getItem("token");
     const [prets, setPrets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editId, setEditId] = useState(null);
@@ -27,7 +28,11 @@ function Pret() {
     useEffect(() => {
         const fetchPrets = async () => {
             try {
-                const response = await axios.get("/api/prets");
+                const response = await axios.get("/api/prets", {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 const pretsData = response?.data?.prets;
 
                 if (pretsData) {
@@ -47,7 +52,7 @@ function Pret() {
         }, 500)
 
 
-    }, []);
+    }, [token]);
 
 
     const SupprimerPret = async (pretId, e) => {
@@ -56,7 +61,11 @@ function Pret() {
         console.log(pretId);
         try {
             if (confirm("Êtes-vous sûr de vouloir supprimer cet enregistrement ?")) {
-                const sup = await axios.delete(`/api/prets/delete/${pretId}`);
+                const sup = await axios.delete(`/api/prets/delete/${pretId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
                 console.log(sup.data.message);
                 const newPrets = prets.filter(pret => pret.id != pretId)
                 setPrets(newPrets);
@@ -83,6 +92,11 @@ function Pret() {
                     montant: formData.montant,
                     taux_de_pret: formData.taux,
                     date_de_pret: formData.date
+                }, 
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
                 }
             );
             setPrets((prevPrets) =>
@@ -93,27 +107,8 @@ function Pret() {
             toast.success(mod.data.message)
             console.log(mod);
 
-
-
-
         } catch (error) {
-            if (error.response.data.errors.numeroCompte) {
-                toast.error("Numero de compte est obligatoire")
-            } else if (error.response.data.errors.nomClient) {
-                toast.error("Nom du client est obligatoire")
-            } else if (error.response.data.errors.nomBanque) {
-                toast.error("Nom du banque est obligatoire")
-            } else if (error.response.data.errors.montant) {
-                toast.error("Montant est obligatoire")
-            } else if (error.response.data.errors.taux_de_pret) {
-                toast.error("Taux de prêt est obligatoire")
-            } else if (error.response.data.errors.date_de_pret) {
-                toast.error("Date de prêt est obligatoire")
-            } else {
-                toast.error("Erreur: ", error)
-            }
-
-
+             toast.error("Erreur", error)
         }
     }
 
@@ -171,6 +166,7 @@ function Pret() {
                                                 {editId === pret.id ? (
                                                     <select onChange={(e) => setFormData({ ...formData, nomBanque: e.target.value })} id="nomBanque" value={formData.nomBanque} className="px-1 outline-none border-1 rounded-sm w-[80px] bg-gray-700">
                                                         <option value="BNI">BNI</option>
+                                                        <option value="Acces banque">Accès Banque</option>
                                                         <option value="BFV">BFV</option>
                                                         <option value="BOA">BOA</option>
                                                     </select>
