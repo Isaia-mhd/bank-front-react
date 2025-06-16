@@ -5,7 +5,6 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/fr';
 import Spinner from "./Spinner";
 import BilanMultiLineChart from "./BilanLineChart";
-import BilanLine from "./BilanLine";
 
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
@@ -32,6 +31,8 @@ function Bilan() {
             setPret(pretRes.data.prets || []);
             setBilan(res.data.bilan_mensuel);
             setGlobal(res.data.global);
+            console.log(pret);
+            
         } catch (error) {
             console.log(error);
         } finally {
@@ -40,78 +41,47 @@ function Bilan() {
     };
 
         fetchBilan();
-    }, [token]);
+    }, [pret, token]);
 
     return (
         <>
             {loading ? <Spinner /> : (
-                <div className="dark w-full bg-gray-900 text-white min-h-screen px-6 py-10 font-sans">
-                    <h1 className="text-3xl font-bold mb-2">Bilan</h1>
-                    <p className="text-gray-400 mb-10">Vue d’ensemble des prêts bancaires</p>
+                <div className="dark w-full bg-gray-300 min-h-screen px-6 py-10 font-sans">
+                    <h1 className="text-xl text-center text-black mb-2 uppercase font-bold">Bilan</h1>
 
-                    {/* Stat Cards */}
+                    <div className="w-full flex justify-between items-start">
+                        {/* Stat Cards */}
 
-                    {global && (
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
-                        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h2 className="text-lg font-semibold text-gray-300 mb-1">Total Global à Payer</h2>
-                        <p className="text-3xl font-bold text-green-400">
-                            {parseFloat(global.total).toLocaleString('fr-FR')} ar
-                        </p>
+                        {global && (
+                        <div className="w-[20%] flex flex-col gap-6 mt-10 justify-center items-center">
+                            <div className="w-[240px] bg-sky-400 p-2 rounded-lg shadow-md">
+                            <h2 className="text-md font-semibold text-gray-300 mb-1">Prêt Total</h2>
+                            <p className="text-lg font-bold text-slate-800">
+                                {parseFloat(global.total).toLocaleString('fr-FR')} ar
+                            </p>
+                            </div>
+
+                            <div className="w-[240px] bg-emerald-500 p-2 rounded-lg shadow-md">
+                            <h2 className="text-md font-semibold text-gray-300 mb-1">Prêt Maximum</h2>
+                            <p className="text-lg font-bold text-slate-800">
+                                {parseFloat(global.max).toLocaleString('fr-FR')} ar
+                            </p>
+                            </div>
+
+                            <div className="w-[240px] bg-amber-500 p-2 rounded-lg shadow-md">
+                            <h2 className="text-md font-semibold text-gray-300 mb-1">Prêt Minimum</h2>
+                            <p className="text-lg font-bold text-slate-800">
+                                {parseFloat(global.min).toLocaleString('fr-FR')} ar
+                            </p>
+                            </div>
                         </div>
+                        )}
 
-                        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h2 className="text-lg font-semibold text-gray-300 mb-1">Prêt Maximum Global</h2>
-                        <p className="text-3xl font-bold text-yellow-400">
-                            {parseFloat(global.max).toLocaleString('fr-FR')} ar
-                        </p>
+                        {/* GRAPHIQUE */}
+                        <div className="w-[70%] mt-12">
+                            <h2 className="text-2xl font-semibold mb-4">Tendance mensuelle des prêts</h2>
+                            <BilanMultiLineChart dataBilan={bilan} />
                         </div>
-
-                        <div className="bg-gray-800 p-6 rounded-lg shadow-md">
-                        <h2 className="text-lg font-semibold text-gray-300 mb-1">Prêt Minimum Global</h2>
-                        <p className="text-3xl font-bold text-red-400">
-                            {parseFloat(global.min).toLocaleString('fr-FR')} ar
-                        </p>
-                        </div>
-                    </div>
-                    )}
-
-
-                    {/* Derniers prêts */}
-                    <div className="mt-12">
-                        <h2 className="text-2xl font-semibold mb-4">Derniers prêts</h2>
-                        <div className="bg-gray-800 rounded-lg p-4 overflow-x-auto">
-                            <table className="w-full table-auto text-left text-sm">
-                                <thead className="text-gray-400 border-b border-gray-700">
-                                    <tr>
-                                        <th className="py-2 px-4">Nom</th>
-                                        <th className="py-2 px-4">Montant</th>
-                                        <th className="py-2 px-4">Taux</th>
-                                        <th className="py-2 px-4">à Payer</th>
-                                        <th className="py-2 px-4">Date</th>
-                                        <th className="py-2 px-4">Banque</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {pret.slice(0, 3).map((item, i) => (
-                                        <tr key={i} className="border-b border-gray-800 hover:bg-gray-700">
-                                            <td className="py-2 px-4">{item.nomClient}</td>
-                                            <td className="py-2 px-4">{item.montant} ar</td>
-                                            <td className="py-2 px-4">{item.taux_de_pret} %</td>
-                                            <td className="py-2 px-4">{item.totalPayer} ar</td>
-                                            <td className="py-2 px-4">{dayjs(item.date_de_pret).format('D MMMM YYYY')}</td>
-                                            <td className="py-2 px-4">{item.nomBanque}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    {/* GRAPHIQUE */}
-                    <div className="mt-12">
-                        <h2 className="text-2xl font-semibold mb-4">Évolution mensuelle</h2>
-                        <BilanMultiLineChart dataBilan={bilan} />
                     </div>
                 </div>
             )}

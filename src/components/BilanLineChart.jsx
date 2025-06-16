@@ -26,17 +26,17 @@ const BilanMultiBarChart = ({ dataBilan }) => {
       {
         label: 'Total à Payer',
         data: dataBilan.map(item => item.total),
-        backgroundColor: '#00cc66',
+        backgroundColor: '#38BDF8',
       },
       {
         label: 'Prêt Maximum',
         data: dataBilan.map(item => item.max),
-        backgroundColor: '#ffcc00',
+        backgroundColor: '#10B981',
       },
       {
         label: 'Prêt Minimum',
         data: dataBilan.map(item => item.min),
-        backgroundColor: '#ff4444',
+        backgroundColor: '#F59E0B',
       }
     ]
   }), [dataBilan, labels]);
@@ -51,12 +51,12 @@ const BilanMultiBarChart = ({ dataBilan }) => {
     },
     scales: {
       y: {
-        // beginAtZero: true,
-        min: 0, // 👈 IMPORTANT : on force ici le 0 !
+        beginAtZero: true,
+        min: 0,
         ticks: {
-            stepSize: 10000, // ou 10000 si tu veux plus fin
+            stepSize: 10000,
             callback: function (value) {
-            return new Intl.NumberFormat('fr-FR').format(value) + ' Ar';
+            return new Intl.NumberFormat('fr-FR').format(value);
             }
         }
       }

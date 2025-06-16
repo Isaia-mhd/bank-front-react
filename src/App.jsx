@@ -8,12 +8,13 @@ import 'react-toastify/dist/ReactToastify.css';
 import Bilan from './components/Bilan';
 import Login from './components/Login';
 import PrivateRoute from "./hooks/PrivateRoute";
+import Footer from './components/Footer';
 
 
 function App() {
   return (
     <>
-      <div className="h-full bg-dark flex bg-slate-800 gap-4">
+      <div className=" min-h-screen bg-gray-300 gap-4">
         <BrowserRouter>
           <Header />
           <Routes>
@@ -27,10 +28,11 @@ function App() {
 
             <Route path="/login" element={<Login />} />
           </Routes>
+         <Footer /> 
         </BrowserRouter>
 
       <ToastContainer
-        position="top-center"
+        position="bottom-center"
         autoClose={3000}
         hideProgressBar={false}
         newestOnTop={false}
