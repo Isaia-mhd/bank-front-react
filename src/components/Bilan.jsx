@@ -14,30 +14,51 @@ function Bilan() {
     const [loading, setLoading] = useState(true);
     const [bilan, setBilan] = useState([]);
     const [pret, setPret] = useState([]);
+    const [global, setGlobal] = useState(null);
     const token = localStorage.getItem("token");
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await axios.get("/api/bilan", {
+        // const fetchData = async () => {
+        //     try {
+        //         const res = await axios.get("/api/bilan", {
+        //             headers: { Authorization: `Bearer ${token}` },
+        //         });
+        //         const pretRes = await axios.get("/api/prets", {
+        //             headers: { Authorization: `Bearer ${token}` },
+        //         });
+
+        //         setPret(pretRes.data.prets || []);
+        //         setBilan(res.data || []);
+        //         console.log("Bilan reçu :", res.data);
+
+        //     } catch (error) {
+        //         console.error("Erreur lors du chargement du bilan :", error);
+        //     } finally {
+        //         setTimeout(() => setLoading(false), 1400);
+        //     }
+        // };
+
+        const fetchBilan = async () => {
+        try {
+            const res = await axios.get("/api/bilan", {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            const pretRes = await axios.get("/api/prets", {
                     headers: { Authorization: `Bearer ${token}` },
-                });
-                const pretRes = await axios.get("/api/prets", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+            });
 
-                setPret(pretRes.data.prets || []);
-                setBilan(res.data || []);
-                console.log("Bilan reçu :", res.data);
+            setPret(pretRes.data.prets || []);
+            setBilan(res.data.bilan_mensuel);
+            setGlobal(res.data.global);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setTimeout(() => setLoading(false), 1400);
+        }
+    };
 
-            } catch (error) {
-                console.error("Erreur lors du chargement du bilan :", error);
-            } finally {
-                setTimeout(() => setLoading(false), 1400);
-            }
-        };
-
-        fetchData();
+        fetchBilan();
     }, [token]);
 
     return (
@@ -48,7 +69,7 @@ function Bilan() {
                     <p className="text-gray-400 mb-10">Vue d’ensemble des prêts bancaires</p>
 
                     {/* Stat Cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         <div className="bg-gray-800 p-6 rounded-lg shadow-md">
                             <h2 className="text-lg font-semibold text-gray-300 mb-1">Total Prêts à Payer</h2>
                             <p className="text-3xl font-bold text-green-400">
@@ -67,7 +88,33 @@ function Bilan() {
                                 {bilan[0]?.min ?? '0'} ar
                             </p>
                         </div>
-                    </div>
+                    </div> */}
+
+                    {global && (
+  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
+    <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+      <h2 className="text-lg font-semibold text-gray-300 mb-1">Total Global à Payer</h2>
+      <p className="text-3xl font-bold text-green-400">
+        {parseFloat(global.total).toLocaleString('fr-FR')} ar
+      </p>
+    </div>
+
+    <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+      <h2 className="text-lg font-semibold text-gray-300 mb-1">Prêt Maximum Global</h2>
+      <p className="text-3xl font-bold text-yellow-400">
+        {parseFloat(global.max).toLocaleString('fr-FR')} ar
+      </p>
+    </div>
+
+    <div className="bg-gray-800 p-6 rounded-lg shadow-md">
+      <h2 className="text-lg font-semibold text-gray-300 mb-1">Prêt Minimum Global</h2>
+      <p className="text-3xl font-bold text-red-400">
+        {parseFloat(global.min).toLocaleString('fr-FR')} ar
+      </p>
+    </div>
+  </div>
+)}
+
 
                     {/* Derniers prêts */}
                     <div className="mt-12">
