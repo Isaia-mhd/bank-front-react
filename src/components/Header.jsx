@@ -55,7 +55,7 @@ function Header() {
         {token && (
           <button
             onClick={handleLogout}
-            className="text-lg text-red-600 hover:text-red-700 px-2 transition duration-300"
+            className="text-lg text-red-600 cursor-pointer hover:text-red-700 px-2 transition duration-300"
             title="Déconnexion"
           >
             <FaSignOutAlt />
