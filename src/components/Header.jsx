@@ -22,14 +22,7 @@ function Header() {
           Accueil
         </Link>
 
-        {!token && (
-          <Link
-            to="/login"
-            className="text-sm md:text-base px-3 py-1 font-semibold rounded-full hover:bg-white hover:text-indigo-500 transition duration-300"
-          >
-            Connexion
-          </Link>
-        )}
+       
 
         <Link
           to="/prets"
@@ -51,6 +44,15 @@ function Header() {
         >
           Bilan
         </Link>
+
+         {!token && (
+          <Link
+            to="/login"
+            className="text-sm md:text-base px-3 py-1 font-semibold rounded-full hover:bg-white hover:text-indigo-500 transition duration-300"
+          >
+            Connexion
+          </Link>
+        )}
 
         {token && (
           <button

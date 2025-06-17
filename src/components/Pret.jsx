@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/fr';
 import Spinner from "./Spinner";
+import { useNavigate } from "react-router-dom";
 
 dayjs.extend(relativeTime);
 dayjs.locale('fr');
@@ -15,15 +16,8 @@ function Pret() {
     const token = localStorage.getItem("token");
     const [prets, setPrets] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [editId, setEditId] = useState(null);
-    const [formData, setFormData] = useState({
-        numeroCompte: "",
-        nomClient: "",
-        nomBanque: "",
-        montant: 0,
-        taux: 0,
-        date: ""
-    });
+    const navigate = useNavigate();
+   
 
     useEffect(() => {
         const fetchPrets = async () => {
@@ -43,6 +37,7 @@ function Pret() {
                 }
             } catch (error) {
                 console.error("Erreur lors de la récupération des prêts :", error);
+                toast.error("Verifier le serveur")
             }
         };
 
@@ -74,32 +69,9 @@ function Pret() {
         }
     }
 
-    const modifier = async (pretId) => {
-        try {
-            const mod = await axios.put(`/api/prets/update/${pretId}`,
-                {
-                    numeroCompte: formData.numeroCompte,
-                    nomClient: formData.nomClient,
-                    nomBanque: formData.nomBanque,
-                    montant: formData.montant,
-                    taux_de_pret: formData.taux,
-                    date_de_pret: formData.date
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-            );
-            setPrets((prevPrets) =>
-                prevPrets.map((pret) =>
-                    pret.id === pretId ? mod.data.pret : pret
-                )
-            );
-            toast.success(mod.data.message);
-        } catch (error) {
-            toast.error("Erreur lors de la modification", error);
-        }
+    const maj = async (pretId, e) => {
+        e.preventDefault();
+       navigate(`/modification/${pretId}`);
     }
 
     return (
@@ -127,88 +99,49 @@ function Pret() {
                                     {Object.entries(prets).map(([key, pret]) => (
                                         <tr key={key} className="border-t border-gray-200 hover:bg-sky-50 cursor-pointer transition text-sm">
                                             <td className="px-4 py-2 font-medium">
-                                                {editId === pret.id ? (
-                                                    <input type="text" className="px-1 outline-none border rounded-sm w-[150px]" value={formData.numeroCompte} onChange={(e) => setFormData({ ...formData, numeroCompte: e.target.value })} />
-                                                ) : (
+                                              
                                                     <p className="w-[150px]">{pret.numeroCompte}</p>
-                                                )}
+                                                
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {editId === pret.id ? (
-                                                    <input type="text" className="px-1 outline-none border rounded-sm w-[150px]" value={formData.nomClient} onChange={(e) => setFormData({ ...formData, nomClient: e.target.value })} />
-                                                ) : (
+                                                
                                                     <p className="truncate w-[150px]">{pret.nomClient}</p>
-                                                )}
+                                                
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {editId === pret.id ? (
-                                                    <select onChange={(e) => setFormData({ ...formData, nomBanque: e.target.value })} value={formData.nomBanque} className="px-1 outline-none border rounded-sm w-[80px] bg-white border-gray-300">
-                                                        <option value="BNI">BNI</option>
-                                                        <option value="Acces banque">Accès Banque</option>
-                                                        <option value="BFV">BFV</option>
-                                                        <option value="BOA">BOA</option>
-                                                    </select>
-                                                ) : (
+                                               
                                                     <p className="w-[80px]">{pret.nomBanque}</p>
-                                                )}
+                                                
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {editId === pret.id ? (
-                                                    <input type="number" className="px-1 outline-none border rounded-sm w-[50px]" value={formData.taux} onChange={(e) => setFormData({ ...formData, taux: e.target.value })} />
-                                                ) : (
-                                                    <p className="w-[50px]">{pret.taux_de_pret} %</p>
-                                                )}
+                                               <p className="w-[80px]">{pret.taux_de_pret} %</p>
+                                              
                                             </td>
 
                                             <td className="px-4 py-2">
-                                                {editId === pret.id ? (
-                                                    <input type="number" className="px-1 outline-none border rounded-sm w-[100px]" value={formData.montant} onChange={(e) => setFormData({ ...formData, montant: e.target.value })} />
-                                                ) : (
+                                                
                                                     <p className="w-[100px]">{Math.round(pret.montant * 100) / 100} Ar</p>
-                                                )}
+                                               
                                             </td>
 
                                             <td className="px-4 py-2 font-medium">
-                                                {editId === pret.id ? (
-                                                    <input type="date" className="px-1 outline-none border rounded-sm w-[150px]" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} />
-                                                ) : (
+                                                
                                                     <p className="w-[150px]">{dayjs(pret.date_de_pret).format('D MMMM YYYY')}</p>
-                                                )}
+                                             
                                             </td>
 
                                             <td className="px-4 py-2 font-medium">{Math.round(pret.totalPayer * 100) / 100}</td>
 
                                             <td className="px-4 py-2 text-emerald-500">
-                                                {editId === pret.id ? (
-                                                    <div className="flex gap-2">
-                                                        <FaSave
-                                                            onClick={() => {
-                                                                modifier(pret.id);
-                                                                setEditId(null);
-                                                            }}
-                                                            className="cursor-pointer text-amber-500 hover:text-amber-600"
-                                                        />
-                                                        <MdCancel onClick={() => setEditId(null)} className="cursor-pointer text-red-500 hover:text-red-600" />
-                                                    </div>
-                                                ) : (
+                                                
                                                     <FaPen
-                                                        onClick={() => {
-                                                            setFormData({
-                                                                numeroCompte: pret.numeroCompte,
-                                                                nomClient: pret.nomClient,
-                                                                nomBanque: pret.nomBanque,
-                                                                montant: pret.montant,
-                                                                taux: pret.taux_de_pret,
-                                                                date: pret.date_de_pret
-                                                            });
-                                                            setEditId(pret.id);
-                                                        }}
+                                                        onClick={(e) => maj(pret.id, e) }
                                                         className="cursor-pointer hover:text-sky-600"
                                                     />
-                                                )}
+                                                
                                             </td>
 
                                             <td className="px-4 py-2 text-red-500">

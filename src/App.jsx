@@ -9,6 +9,7 @@ import Bilan from './components/Bilan';
 import Login from './components/Login';
 import PrivateRoute from "./hooks/PrivateRoute";
 import Footer from './components/Footer';
+import Maj from './components/Maj';
 
 
 function App() {
@@ -25,6 +26,9 @@ function App() {
             <Route path="/nouveau" element={<PrivateRoute element={<Nouveau />} />} />
 
             <Route path="/bilan" element={<PrivateRoute element={<Bilan />} />} />
+
+            <Route path="/modification/:Id" element={<PrivateRoute element={<Maj />} />} />
+
 
             <Route path="/login" element={<Login />} />
           </Routes>
